@@ -9,6 +9,16 @@ namespace NodeGraph
         [SerializeField] private Vector3 scale = Vector3.one;
         [SerializeField] private Vector3 position = Vector3.zero;
         [SerializeField] private SerializableTuple<string, RenderPipelineProprerty[]>[] properties = Array.Empty<SerializableTuple<string, RenderPipelineProprerty[]>>();
+        
+
+        // Unity's new-ish Shader Keyword Filtering performs a recursive search on all members
+        // of the render pipeline asset. It seems that in some circumstances the search space becomes 
+        // impossibly large, practically preventing builds from completing. Current versions of the 
+        // code skip fields marked 'Obsolete' in the search, so I'm using this to prevent the search 
+        // from descending into the graph's nodes. This allows builds to complete in my current project, 
+        // and reveals no OBVIOUS issues in CURSORY testing of builds. Further testing may show that 
+        // more selective pruning of references may be required.
+        [System.Obsolete("Not obsolete. Tagged as workaround for Shader Keyword Filter recursion bug.", false)]
         [SerializeField] private List<BaseNode> nodes = new List<BaseNode>();
 
         protected readonly HashSet<BaseNode> processedNodes = new HashSet<BaseNode>();
